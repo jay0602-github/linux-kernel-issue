@@ -1,0 +1,19 @@
+# /opt/ansible/add_infra_sudo.yml
+- hosts: all
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Ensure sudoers.d exists
+      ansible.builtin.file:
+        path: /etc/sudoers.d
+        state: directory
+        mode: '0750'
+
+    - name: Add passwordless sudo for infra
+      ansible.builtin.copy:
+        dest: /etc/sudoers.d/90-cloud-init-users
+        content: "infra ALL=(ALL:ALL) NOPASSWD:ALL\n"
+        owner: root
+        group: root
+        mode: '0440'
+        validate: 'visudo -cf %s'
